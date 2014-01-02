@@ -1,0 +1,173 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Author" CONTENT="Maurice Herlihy">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.05 [en] (X11; I; OSF1 V4.0 alpha) [Netscape]">
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FDF5E6" LINK="#0000EE" VLINK="#551A8B" ALINK="#FF0000">
+
+<CENTER>
+<H1>
+Aleph Toolkit Tutorial</H1></CENTER>
+This document is an introduction to using the Aleph Toolkit, a collection
+of Java<SUP><FONT SIZE=-2>tm </FONT></SUP>packages implementing a simple,
+platform-independent distributed shared object system. It does not describe the
+mechanics of how to install or run the toolkit, which may vary from site
+to site. For that kind of information, please see the <A HREF="userGuide.html"><I>User's
+Guide</I>.</A>
+
+<P>A toolkit client is a distributed program that runs on a number of logical
+processors, called <I>Processing Elements </I>(PEs). Each PE is a Java
+Virtual Machine, with its own address space. PEs communicate in various
+ways:
+<UL>
+<LI>
+One PE can create and start a <I>remote thread</I> at another.</LI>
+
+<LI>
+PEs can share <I>global objects.</I></LI>
+
+<LI>
+PEs can synchronize by <I>Event objects</I> which support reliable ordered
+multicast.</LI>
+</UL>
+
+<H2>
+Hello World</H2>
+To illustrate how remote threads work, we will construct a <A HREF="examples/Counter.java"><TT>Hello</TT>
+</A>class implementing the customary <I>Hello World </I>application. The
+first step is to make the Aleph API available to the program:
+<UL><TT><B>import</B> aleph.*;</TT>
+<BR><TT><B>public class</B> Hello {</TT></UL>
+The remote thread that will execute at each PE is defined as a static inner
+class:
+<UL><TT><B>static class</B> HelloThread <B>extends</B> RemoteThread {</TT>
+<BR><TT>&nbsp; <B>public</B> void run() {</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp; System.out.println("Hello World from PE " +
+PE.thisPE() +</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+" of " + PE.numPEs());</TT>
+<BR><TT>&nbsp; }</TT>
+<BR><TT>}</TT></UL>
+Every remote thread must extend the abstract class <TT><A HREF="doc/aleph.RemoteThread.html">aleph.RemoteThread</A>.
+</TT>Like regular Java threads (<TT>java.lang.Thread)</TT>, the class must
+provide a <TT>public void run()</TT> method to be called when the thread
+is started. The <A HREF="doc/aleph.PE.html"><TT>aleph.PE</TT> </A>class
+manages processing elements (PEs). Here, <TT><A HREF="doc/aleph.PE.html#thisPE">PE.thisPE()</A></TT>
+returns the <TT>PE</TT> where the program is running, and <TT><A HREF="doc/aleph.PE.html#numPEs">PE.numPEs()</A></TT>
+returns the total number of PEs.
+
+<P>As usual for Java programs, your class must include a method with signature
+<UL><TT><B>public static </B>void main(String[] args) {</TT></UL>
+to be called when your program starts. Here, this method starts by creating
+an instance of a remote thread object.
+<UL><TT>HelloThread thread = <B>new </B>HelloThread();</TT></UL>
+As with regular threads, a remote thread does not start executing until
+it is explicitly started. Next, the program creates an <TT><A HREF="doc/aleph.Join.html">aleph.Join</A></TT>
+object to allow the caller to wait until the remote threads have completed:
+<UL><TT>Join join = <B>new </B>Join();</TT></UL>
+The method then executes a <B><TT>for</TT> </B>loop , which uses <TT><A HREF="doc/aleph.PE.html#allPEs()">PE.allPEs()
+</A></TT>to enumerate all PEs. The loop body starts an instance of the
+remote thread at each PE. (Unlike <TT>java.lang.Thread</TT>, it is possible
+to start a single <A HREF="doc/aleph.RemoteThread.html"><TT>RemoteThread</TT>
+</A>instance multiple times.)
+<UL><TT><B>for </B>(Enumeration e = PE.allPEs(); e.hasMoreElements(); )</TT>
+<BR><TT>&nbsp; thread.start((PE) e.nextElement(), join);</TT></UL>
+Finally, the caller waits for all remote threads to finish.
+<UL><TT>join.waitFor();</TT></UL>
+The result of running this program should look something like this:
+<UL><B><TT>Hello world from PE[0] of 4</TT></B>
+<BR><B><TT>Hello world from PE[1] of 4</TT></B>
+<BR><B><TT>Hello world from PE[2] of 4</TT></B>
+<BR><B><TT>Hello world from PE[3] of 4</TT></B></UL>
+Another way to write this program is to use a <TT><A HREF="doc/aleph.RemoteFunction.html">RemoteFunction</A></TT>
+, which is a remote thread that returns a result (essentially a remote
+procedure call).&nbsp; Here, the remote function must define a <TT>run
+</TT>method that returns a value:
+<UL><TT>&nbsp; <B>static</B> <B>class</B> HelloThread <B>extends</B> RemoteFunction{</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp; <B>public</B> Object run() {</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <B>return</B> "Hello world from
+" + PE.thisPE() + " of " + PE.numPEs();</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp; }</TT></UL>
+The caller collects the responses by iterating over a <TT><A HREF="doc/aleph.Join.html">join</A></TT>
+object:
+
+<P><TT>&nbsp;&nbsp;&nbsp; <B>while</B>(join.hasMoreElements())</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.println((String) join.nextElement());</TT>
+<H2>
+Global Objects</H2>
+PEs can also share data structures called <I>global objects, </I>defined
+by the <TT><A HREF="doc/aleph.GlobalObject.html">GlobalObject</A></TT>
+interface. To illustrate how global objects work, we will construct a <A HREF="examples/Counter.java"><TT>Counter</TT>
+</A>class implementing a simple shared counter application. A global object
+is a container for a regular Java object. In this case, the counter is
+defined as a class:
+
+<P>&nbsp;&nbsp;&nbsp;&nbsp; <TT><B>public class</B> Counter <B>implements</B>
+java.io.Serializable {</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp; <B>public</B> long value;</TT>
+
+<P>All objects shared by PEs must implement <TT>java.io.Serializable</TT>.
+The <TT>main</TT> method for the class simply encapsulates the counter
+in a <TT>GlobalObject</TT> as follows:
+
+<P><TT>&nbsp; GlobalObject global = new GlobalObject(new Counter());</TT>
+
+<P>This object is passed as an argument to the constructor for the user's
+threads:
+
+<P><TT>&nbsp; <B>public</B> UserThread(GlobalObject global) {</TT>
+
+<P>Each user thread access the counter by opening the global object in
+``write'' mode:
+
+<P><TT>&nbsp; Counter counter = (Counter) global.open("w");</TT>
+
+<P>The cast is necessary because <TT>open</TT> returns an object of class
+<TT>java.lang.object,</TT> and the ``<TT>w</TT>'' indicates that the object
+is to be accessed in write mode. Currently supported modes are <I>read
+</I><TT>"r"</TT> and <I>write </I><TT>"w"</TT>. In <I>read </I>mode, the
+object is up-to-date, but should not be modified. In <I>write </I>mode,
+the object is up-to-date, and may be modified. Note that thread-level synchronization
+may be needed to support concurrent <I>write </I>and <I>copy </I>accesses.
+
+<P>Once the counter is open, it can be modified and released.
+
+<P><TT>&nbsp; Counter.value++;</TT>
+<BR><TT>&nbsp; global.release();</TT>
+
+<P>The Aleph toolkit also supports <A HREF="doc/aleph.Transaction.html">transactions
+</A>running at a single PE. Here is a simple example:
+
+<P><TT>&nbsp; Transaction t = <B>new </B>Transaction();</TT>
+<BR><TT>&nbsp; Counter counter = (Counter) global.open(t, "w");</TT>
+<BR><TT>&nbsp; <B>if </B>(t.commit())</TT>
+<BR><TT>&nbsp;&nbsp;&nbsp; System.out.println("Counter incremented");</TT>
+<BR><TT>&nbsp; <B>else</B></TT>
+<BR><TT>&nbsp;&nbsp;&nbsp; System.out.println("Counter increment failed");</TT>
+
+<P>For the time being, transactions must execute entirely within a single
+PE.
+<H1>
+Events</H1>
+&nbsp;<A HREF="doc/aleph.Event.html">Events</A> provide a simple and flexible
+way for threads in different PEs to synchronize. An <TT>Event </TT>object
+is a kind of global object: it can be shared among multiple PEs.
+<BR>&nbsp;
+<BR>&nbsp;When a thread calls an <TT>Event</TT> object's <TT>signal </TT>method,
+then that signal is (conceptually, at least) broadcast to all other PEs,
+together with a copy of the (optional) argument to the call.
+
+<P>If a PE wants to be notified that an event has been signaled, it registers
+a <A HREF="doc/aleph.Listener.html">Listener</A> object with that event.
+Just as in the Abstract Window Toolkit (awt), the listener is a dummy object
+that provides a <TT>void actionPerformed(Object object)</TT> method that
+is called when the event is signaled. The argument to the method is the
+argument to signal, or <TT>null</TT> if there was no argument. Signals
+are delivered in order, and each signal is delivered only once to each
+PE.
+
+<P>For an example of how to use events, see the implementation of the&nbsp;
+<A HREF="Barrier.java">Barrier</A>&nbsp; class.
+</BODY>
+</HTML>

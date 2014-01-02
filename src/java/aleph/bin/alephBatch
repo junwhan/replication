@@ -1,0 +1,17 @@
+#!/bin/csh
+set java_args = ""
+set aleph_args = ""
+
+while ("$1" != "")
+	if ("$1" =~ -D*) then
+		set java_args = ($java_args $1)
+	else
+		set aleph_args = ($aleph_args $1)
+	endif
+	shift
+end
+java $java_args  -Daleph.batch=true aleph.Aleph $aleph_args
+
+
+
+

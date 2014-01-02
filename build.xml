@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+
+<project name="Duece" default="agent" basedir=".">
+	<property file="build.properties"/>
+
+	<target name="agent" depends="compile,res,jar" />
+
+	<target name="compile">
+		<exec executable="hg" outputproperty="hgrevid">
+			<arg value="id" />
+		</exec>
+		<replaceregexp file="src/hyFlow/edu/vt/rt/hyflow/HGREVID.java"
+			 match='".*"'
+			 replace='"${hgrevid}"'/>
+		<mkdir dir="${bin}"/>
+		<javac nowarn="true" destdir="${bin}" source="1.6" debug="true" debuglevel="lines,vars,source">
+			<src path="${src}"/>
+			<exclude name="aleph/examples/**" />
+			<exclude name="aleph/bin/**" />
+			<exclude name="aleph/doc/**" />
+			<exclude name="aleph/tools/**" />
+			<exclude name="aleph/bench/**" />
+			<exclude name="aleph/trans/**" />
+			<exclude name="aleph/desktop/**" />
+			<exclude name="aleph/Transaction.java" />
+			<exclude name="edu/vt/rt/hyflow/util/network/sctp/**" />
+		</javac>
+		<replaceregexp file="src/hyFlow/edu/vt/rt/hyflow/HGREVID.java"
+                         match='".*"'
+                         replace='""'/>
+	</target>
+	
+	<target name="res">
+		<copy file="src/hyFlow/edu/vt/rt/hyflow/default.conf" todir="${bin}/edu/vt/rt/hyflow"/>
+	</target>
+	
+	<target name="jar">
+		<jar destfile="hyflow.jar" >
+			<fileset dir="${bin}"/>
+			<fileset dir="src/java/" includes="**/*.java"/>
+			<fileset dir="src/hyFlow/" includes="**/*.java"/>
+			<manifest>
+				<attribute name="Implementation-Vendor" value="hyflow.org" />
+				<attribute name="Implementation-Version" value="1.0"/>
+				<attribute name="Premain-Class" value="${agent}" />
+				<attribute name="Main-Class" value="${main}"/>
+				<attribute name="Can-Redefine-Classes" value="true"/>
+				<attribute name="Can-Retransform-Classes" value="true"/>
+				<attribute name="Compatible" value="1.6"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${bin}" />
+	</target>
+</project>

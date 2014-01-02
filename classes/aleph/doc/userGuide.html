@@ -1,0 +1,263 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Generator" CONTENT="Microsoft Word 97">
+   <META NAME="Template" CONTENT="C:\PROGRAM FILES\MICROSOFT OFFICE\OFFICE\html.dot">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.05 [en] (X11; I; OSF1 V4.0 alpha) [Netscape]">
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FDF5E6" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+&nbsp;
+<CENTER>
+<H1>
+Aleph Toolkit User's Guide</H1></CENTER>
+
+<CENTER>
+<H2>
+Introduction</H2></CENTER>
+
+This document describes how to install and run the Aleph Toolkit, a collection
+of Java<SUP><FONT SIZE=-2>tm&nbsp; </FONT></SUP>packages implementing a simple,
+platform-independent distributed shared object system. For information about
+the Toolkit packages themselves, please see the <I><A
+HREF="tutorial.html">tutorial</A></I>.
+<H1>
+Installation</H1>
+The Aleph toolkit encompasses a top-level <TT>aleph</TT> directory, along
+with the following subdirectories:
+<TABLE BORDER WIDTH="100%" >
+<TR>
+<TD><TT>bench</TT></TD>
+
+<TD>simple benchmarks</TD>
+</TR>
+
+<TR>
+<TD><TT>bin</TT></TD>
+
+<TD>Unix<SUP><FONT SIZE=-2>tm</FONT></SUP> shell scripts</TD>
+</TR>
+
+<TR>
+<TD><TT>comm</TT></TD>
+
+<TD>communication managers</TD>
+</TR>
+
+<TR>
+<TD><TT>dir</TT></TD>
+
+<TD>directory managers</TD>
+</TR>
+
+<TR>
+<TD><TT>doc</TT></TD>
+
+<TD>javadoc and other documentation</TD>
+</TR>
+
+<TR>
+<TD><TT>event</TT></TD>
+
+<TD>event managers</TD>
+</TR>
+
+<TR>
+<TD><TT>examples</TT></TD>
+
+<TD>some simple applications</TD>
+</TR>
+
+<TR>
+<TD><TT>gui</TT></TD>
+
+<TD>user interface classes</TD>
+</TR>
+
+<TR>
+<TD><TT>meter</TT></TD>
+
+<TD>metering and instrumentation</TD>
+</TR>
+
+<TR>
+<TD><TT>logs</TT></TD>
+
+<TD>logging and debugging files</TD>
+</TR>
+
+<TR>
+<TD><TT>tools</TT></TD>
+
+<TD>create, destroy, and monitor computations</TD>
+</TR>
+
+<TR>
+<TD><TT>thread</TT></TD>
+
+<TD>thread-related classes</TD>
+</TR>
+
+<TR>
+<TD><TT>trans</TT></TD>
+
+<TD>transaction managers</TD>
+</TR>
+</TABLE>
+
+<H2>
+The Aleph Run-Time System</H2>
+Logically, the Aleph run-time system consists of a collection of Java Virtual
+Machines called <I>PEs</I> (for <I>Processing Elements</I>). A method executing
+at one PE can start a thread at another PE, and methods executing at distinct
+PEs can share data objects, send messages to one another, and synchronize
+on shared events<I>.</I>
+
+<P>Physically, each PE runs on a machine (usually a workstation), called
+a <I>host</I>. Multiple PEs can run at a single host. Each host that runs
+an Aleph Toolkit application must also run the <I>Aleph Server</I> program.
+The server's job is simply to create new PEs as requested by applications.
+The server is itself a Java program, which must be started at each host
+before running any applications.
+
+<P>The user interacts with the Aleph run-time system through a program
+called the <I>Aleph Console</I>. The Console provides the ability to launch
+applications, to view their results, and to control system parameters such
+as host identities.
+<H2>
+Installing Aleph</H2>
+The easiest way to use Aleph is simply for each user to create a private
+copy of the Aleph directory tree. Only one file needs to be modified in
+a site-specific way: <B><TT><A HREF="doc/aleph.Config.html">Config.java</A></TT></B>
+in the top-level directory. Each host has its own <TT>Config.java </TT>file,
+and the values of the entries may well change from host to host (particularly
+if the hosts run different operating systems). The following entries are
+the most likely to change from one installation to another.
+<TABLE BORDER WIDTH="100%" >
+<TR>
+<TD><TT>int PORT</TT></TD>
+
+<TD>This integer, between 1024 and 65535, is the port number for all servers
+running on behalf of your application. You must choose a port number distinct
+from that of any other application running at the same time.&nbsp;</TD>
+</TR>
+
+<TR>
+<TD><TT>String[] hosts</TT></TD>
+
+<TD>An array of host names for hosts that might be running an Aleph Server.
+When the Aleph console starts up, it queries these hosts to see which ones
+are running an Aleph server listening on your <TT>PORT</TT> number.</TD>
+</TR>
+
+<TR>
+<TD><TT>String pathJava</TT></TD>
+
+<TD>This host's path name for the Java interpreter.</TD>
+</TR>
+</TABLE>
+&nbsp;
+<BR>The remaining fields all have sensible default values, and can be changed
+after perusing the documentation.
+<BR>&nbsp;
+<H2>
+Tools</H2>
+All tools in this section follow the following simple convention.&nbsp;
+If no host names are specified, the tool applies to servers running at
+the hosts in <TT>Config.hosts.</TT> If an integer <I>n</I> is specified,
+the tool applies to the first <I>n</I> hosts in <TT>Config.hosts</TT>.&nbsp;
+If explicit host names are specified, it applies to them.
+<H3>
+Starting Servers</H3>
+The simplest way to start an Aleph server is to log in to a host, connect
+to the desired directory, and explicitly start the server. Assuming your
+<TT>CLASSPATH</TT> points to the root of your Aleph directory tree, start
+the server with:
+<DIR><TT>java aleph.comm.Server</TT></DIR>
+Any PEs created by that server will have the same privileges as the server,
+so if you want your application to access files in your directory, you
+should start the server from your account.
+
+<P>If you are running on a system of mutually-trusting Unix<SUP><FONT SIZE=-2>tm</FONT></SUP>
+workstations, then the <TT>bin</TT> directory contains a <TT>startServers</TT>
+shell script that uses <TT>rsh</TT> to start up servers at the indicated
+hosts in your current working directory. (Make sure that <TT>Config.pathRsh</TT>
+is set to the correct pathname.)
+<H3>
+Shutting Down Servers</H3>
+To shut down servers in an orderly way, use
+<BLOCKQUOTE><TT>java aleph.tools.KillServers</TT></BLOCKQUOTE>
+The <TT>bin</TT> directory also contains a <TT>killServers</TT> shell script.
+You can also use the <I>Exit &amp; Shut Down Hosts</I> entry in the console's
+<I>File </I>menu (described below).
+<H3>
+Detecting Servers</H3>
+To discover where servers are running, use
+<DIR><TT>java aleph.tools.PingServers</TT></DIR>
+The <TT>bin</TT> directory contains a <TT>pingServers</TT> shell script.
+You can also use the <I>refresh</I> item in the console's <I>Hosts</I>
+menu (described below).
+<H2>
+The Aleph Console</H2>
+Once your servers are up and running, you can control your applications
+using the Aleph <I>console</I> .
+<DIR><TT>java <I>&lt;switches></I> aleph.Aleph &lt;<I>args></I></TT></DIR>
+If you are running a Unix shell, you can use the <TT>aleph</TT> shell script.
+
+<P>The console consists of two text areas and various buttons and menu
+items. The <I>File </I>menu lets you shut down the console together with
+all known servers, or shut down the console only. The <I>hosts </I>menu
+is a tear-off menu that keeps a checkbox for each host in <A HREF="doc/aleph.Config.html#hosts"><TT><U><FONT COLOR="#0000FF">Config.hosts</FONT></U></TT>.
+</A>When the server starts up, it queries each of the hosts, and sets the
+checkbox for each one that appears to be running a server. If you turn
+the checkbox off, then the console will not use that host (although the
+server will keep running). <I>Refresh</I> rechecks all the hosts for running
+servers, and <I>Add </I>allows you to enter a new host where a server is
+already running.&nbsp; <I>Help</I> shows current settings for System Properties
+and Aleph Properties.
+
+<P>The upper text field contains the name of your application program (as
+it would appear as an argument to <TT>java</TT>) together with its arguments.&nbsp;
+You can start your application by hitting <I>enter</I>, or by the green
+<I>Start </I>button.&nbsp; The red <I>Stop</I> button will do its best
+to stop a computation in progress.&nbsp; The <I>Clear</I> button clears
+all text fields.
+
+<P>The <I>Verbosity</I> switch controls the number of diagnostic messages
+produced.&nbsp;&nbsp; You can test it at run-time by calling <TT>Aleph.getVerbosity()</TT>.&nbsp;
+<I>Number PEs </I>controls how many PEs the computation will start.&nbsp;
+PEs are started at hosts in round-robin order.&nbsp; The <I>Output</I>
+switch controls where your aplication's output appears.&nbsp; The <I>JIT
+compiler</I> switch controls the choice of JIT.&nbsp; You can add new JITs
+to <TT>Config,compilers</TT>.
+
+<P>If the <I>Profiling</I> checkbox is set, each PE will dump profiling
+information into a file.&nbsp; If <I>Use java_g </I>is set, stack traces
+will probably display more useful information.&nbsp; If <I>Log console
+</I>is set, all output text will be logged to a file.&nbsp; Setting any
+of these checkboxes may slow your computation.&nbsp; All files are created
+by default in the <TT>logs</TT> subdirectory.&nbsp; The default may be
+changed using <TT>Config.logDir</TT>.
+
+<P>Aleph rebinds your application's <TT>System.out</TT> and <TT>System.err</TT>
+streams o display in the lower text field.
+
+<P>The bottom line of choices control the Communication, Directory, Event,
+and Transaction managers.&nbsp; New managers can be added by changing the
+<TT>Config</TT> file.
+<H1>
+Batch Operation</H1>
+Aleph can also be run without a console (particularly useful for shell
+scripts).
+<BLOCKQUOTE><TT>aleph -Daleph.batch=true aleph.Aleph <I>&lt;args></I></TT></BLOCKQUOTE>
+will immediately start up the specificed application without opening the
+console.&nbsp; You can use <A HREF="alephProperties.html">aleph properties
+</A>to control various options, for example:
+<BLOCKQUOTE><TT>aleph -Daleph.batch=true -Daleph.numPEs=2 aleph.Aleph <I>&lt;args></I></TT></BLOCKQUOTE>
+will start your application at two PEs.
+<H1>
+Documentation</H1>
+We recommend running javadoc on the source tree.&nbsp; On most Unix shells,
+<BLOCKQUOTE><TT>make javadoc</TT></BLOCKQUOTE>
+should have the desired effect.
+</BODY>
+</HTML>

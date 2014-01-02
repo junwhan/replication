@@ -1,0 +1,9 @@
+
+Contents of this directory:
+---------------------------
+
+arrow/          standard arrow directory (no read sharing)
+arrow1/         arrow directory with local read sharing
+arrow2/         arrow directory with distributed read sharing
+home/           standard home directory
+hybrid/		hybrid directory (combines arrow and home)

@@ -1,0 +1,10 @@
+# Network Topology: (Node) (Neighbor) (weight) (Neighbor) (weight) ...
+A  B 4  H 8
+B  A 4  C 8  H 11
+C  B 8  D 7  F 4  I 2
+D  C 7  E 9  F 14
+E  D 9  F 10 
+F  E 10 D 14 C 4  G 2
+G  F 2  I 6  H 1
+H  G 1  I 7  B 11 A 8
+I  C 2  G 6  H 7

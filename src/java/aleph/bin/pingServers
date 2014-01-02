@@ -1,0 +1,5 @@
+#!/bin/csh
+# Shell script to start Aleph servers.
+# Digital Unix version.
+java aleph.tools.PingServers $argv
+

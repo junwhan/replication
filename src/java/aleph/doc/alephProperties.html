@@ -1,0 +1,122 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Generator" CONTENT="Microsoft Word 97">
+   <META NAME="Template" CONTENT="C:\PROGRAM FILES\MICROSOFT OFFICE\OFFICE\html.dot">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.05 [en] (X11; I; OSF1 V4.0 alpha) [Netscape]">
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FDF5E6" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+&nbsp;
+<CENTER>
+<H1>
+Aleph Toolkit User's Guide</H1></CENTER>
+
+<CENTER>
+<H2>
+Aleph Properties</H2></CENTER>
+Aleph maintains a set of <I>properties</I>, similar to System properties.&nbsp;
+When the console is started, any system property that starts with the string
+"aleph." is encorporated into the Aleph properties.&nbsp; Aleph properties
+can be created and queried by calls to <TT>Aleph.setProperty()</TT> and
+<TT>Aleph.getProperty()</TT>.&nbsp; When the console creates a new PE,
+all its current Aleph properties are passed to the PE.
+
+<P>The following properties may be useful, either as command-line arguments,
+or to check at run-time.
+<BR>&nbsp;
+<TABLE BORDER WIDTH="100%" NOSAVE >
+<TR>
+<TD><TT>aleph.batch</TT></TD>
+
+<TD>If <I>true</I>, start application without the console.</TD>
+</TR>
+
+<TR>
+<TD><TT>aleph.communicationManager</TT></TD>
+
+<TD>Communication manager, see <TT>Config.communicationManagers</TT></TD>
+</TR>
+
+<TR>
+<TD><TT>aleph.directoryManager</TT></TD>
+
+<TD>Directory manager, see <TT>Config.directoryManagers</TT></TD>
+</TR>
+
+<TR>
+<TD><TT>aleph.eventManager</TT></TD>
+
+<TD>Event manager, see <TT>Config.eventManagers</TT></TD>
+</TR>
+
+<TR>
+<TD><TT>aleph.label</TT></TD>
+
+<TD>PE's print name (default <TT>PE[<I>n</I>]</TT>).</TD>
+</TR>
+
+<TR>
+<TD><TT>aleph.logging</TT></TD>
+
+<TD>If <I>true</I>, log console interactions to a file.</TD>
+</TR>
+
+<TR>
+<TD><TT>aleph.maxPEs</TT></TD>
+
+<TD>Maximum number of PEs on console choice button.</TD>
+</TR>
+
+<TR>
+<TD><TT>aleph.numPEs</TT></TD>
+
+<TD>Number of PEs to start up.</TD>
+</TR>
+
+<TR>
+<TD><TT>aleph.pathJava</TT></TD>
+
+<TD>where to find <TT>java</TT></TD>
+</TR>
+
+<TR>
+<TD><TT>aleph.pathJava_g</TT></TD>
+
+<TD>where to find <TT>java_g</TT></TD>
+</TR>
+
+<TR>
+<TD><TT>aleph.pathRsh</TT></TD>
+
+<TD>where to find rsh (Unix shells only)</TD>
+</TR>
+
+<TR>
+<TD><TT>aleph.profile</TT></TD>
+
+<TD>If <I>true</I>, dump profiling information to file.</TD>
+</TR>
+
+<TR>
+<TD><TT>aleph.transactionManager</TT></TD>
+
+<TD>Transaction manager, see <TT>Config.transactionManagers</TT></TD>
+</TR>
+
+<TR>
+<TD><TT>aleph.useJava_g</TT></TD>
+
+<TD>If <I>true</I>, run applications using <TT>java_g.</TT></TD>
+</TR>
+
+<TR>
+<TD><TT>aleph.verbosity</TT></TD>
+
+<TD>Diagnostic messages: 0, 1, or 2 are sensible values.</TD>
+</TR>
+</TABLE>
+&nbsp;
+<BR>Aleph uses other properties internally, and users are advised not to
+modify them.
+</BODY>
+</HTML>

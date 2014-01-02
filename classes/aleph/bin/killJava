@@ -1,0 +1,12 @@
+#!/bin/csh
+# Shell script to kill all Java processes
+
+echo Cleanly killing servers:
+java aleph.tools.KillServers
+
+echo Killing local Java processes:
+nkill -all java > /dev/null
+
+echo Killing remote Java processes:
+java aleph.tools.KillJava
+

@@ -1,0 +1,10 @@
+#!/bin/csh
+
+echo -n Removing aleph logs...
+
+/bin/rm logs/* >& /dev/null
+echo done.
+
+if (-x /usr/bin/sync) then
+    /usr/bin/sync
+    endif
